@@ -62,7 +62,7 @@ export class OrdersService {
       throw new BadRequestException('Some products were not found');
     }
 
-    // take the price from the db, never trust the price from the client
+    // price comes from the db, not from the request
     const items = dto.items.map((item) => {
       const product = products.find((p) => p.id === item.productId)!;
       return { productId: item.productId, quantity: item.quantity, price: product.price };
@@ -91,7 +91,6 @@ export class OrdersService {
         throw new BadRequestException(`Can't change order from ${order.status} to ${status}`);
       }
 
-      // confirming takes the items out of the warehouse
       if (status === OrderStatus.CONFIRMED) {
         for (const item of order.items) {
           await this.stock.changeStock(tx, item.productId, order.warehouseId, -item.quantity);
@@ -109,7 +108,6 @@ export class OrdersService {
         });
       }
 
-      // cancelling a confirmed order puts the items back
       if (status === OrderStatus.CANCELLED && order.status === OrderStatus.CONFIRMED) {
         for (const item of order.items) {
           await this.stock.changeStock(tx, item.productId, order.warehouseId, item.quantity);

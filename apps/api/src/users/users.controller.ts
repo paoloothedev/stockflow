@@ -38,7 +38,6 @@ export class UsersController {
     @Body() dto: UpdateRoleDto,
     @CurrentUser() me: JwtUser,
   ) {
-    // so the admin doesn't lock themselves out by mistake
     if (id === me.id) throw new BadRequestException("You can't change your own role");
     return this.prisma.user.update({ where: { id }, data: { role: dto.role }, select: userSelect });
   }

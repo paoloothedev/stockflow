@@ -29,7 +29,6 @@ export class WarehousesController {
       orderBy: { id: 'asc' },
       include: { stock: { select: { quantity: true } } },
     });
-    // send total items count instead of the whole stock list
     return warehouses.map(({ stock, ...w }) => ({
       ...w,
       totalItems: stock.reduce((sum, s) => sum + s.quantity, 0),

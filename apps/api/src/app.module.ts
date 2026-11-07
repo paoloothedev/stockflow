@@ -32,7 +32,6 @@ import { HealthController } from './health.controller';
   controllers: [HealthController],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
-    // every route needs a token unless it has @Public()
     { provide: APP_GUARD, useClass: AuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
   ],

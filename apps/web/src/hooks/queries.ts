@@ -16,7 +16,6 @@ export function useCategories() {
   });
 }
 
-// small list used in dropdowns (movements, new order)
 export function useProductOptions() {
   return useQuery({
     queryKey: ['products', 'options'],

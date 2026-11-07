@@ -4,7 +4,13 @@ import * as bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 const products = [
-  { sku: 'KB-001', name: 'Mechanical Keyboard RGB', price: 1850, minStock: 5, category: 'Keyboards' },
+  {
+    sku: 'KB-001',
+    name: 'Mechanical Keyboard RGB',
+    price: 1850,
+    minStock: 5,
+    category: 'Keyboards',
+  },
   { sku: 'KB-002', name: 'Wireless Keyboard Slim', price: 950, minStock: 5, category: 'Keyboards' },
   { sku: 'MS-001', name: 'Gaming Mouse 16000 DPI', price: 780, minStock: 8, category: 'Mice' },
   { sku: 'MS-002', name: 'Wireless Mouse Silent', price: 420, minStock: 10, category: 'Mice' },
@@ -17,7 +23,6 @@ const products = [
 ];
 
 async function main() {
-  // start clean every time
   await prisma.stockMovement.deleteMany();
   await prisma.orderItem.deleteMany();
   await prisma.order.deleteMany();
@@ -69,7 +74,7 @@ async function main() {
     });
     created.push(product);
 
-    // a couple of products are low on purpose so the dashboard shows alerts
+    // make some products low on purpose
     const qtyMain = i % 4 === 3 ? 2 : 20 + i * 3;
     const qtyCairo = i % 3 === 0 ? 0 : 6 + i;
 

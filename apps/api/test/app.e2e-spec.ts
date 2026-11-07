@@ -6,7 +6,6 @@ import { AppModule } from '../src/app.module';
 import { PrismaExceptionFilter } from '../src/common/prisma-exception.filter';
 import { PrismaService } from '../src/prisma/prisma.service';
 
-// needs a real postgres, see README (DATABASE_URL should point to a test db)
 describe('StockFlow API (e2e)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
@@ -30,7 +29,6 @@ describe('StockFlow API (e2e)', () => {
       'TRUNCATE "StockMovement", "OrderItem", "Order", "Stock", "Product", "Category", "Warehouse", "User" RESTART IDENTITY CASCADE',
     );
 
-    // first user -> make it admin directly in the db
     const admin = await api()
       .post('/api/auth/register')
       .send({ name: 'Admin', email: 'admin@test.com', password: 'secret123' })

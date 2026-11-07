@@ -8,7 +8,6 @@ import { StatusBadge } from '../components/Badges';
 import { PageLoader } from '../components/Spinner';
 import { date, money } from '../utils/format';
 
-// same rules as the api (orders/order-status.ts)
 const nextActions: Record<OrderStatus, { status: OrderStatus; label: string }[]> = {
   PENDING: [
     { status: 'CONFIRMED', label: 'Confirm order' },
@@ -40,7 +39,6 @@ export default function OrderDetails() {
     mutationFn: (status: OrderStatus) => api.patch(`/orders/${id}/status`, { status }),
     onSuccess: () => {
       toast.success('Order updated');
-      // confirming / cancelling changes the stock too
       for (const key of ['orders', 'products', 'movements', 'warehouses', 'dashboard']) {
         queryClient.invalidateQueries({ queryKey: [key] });
       }

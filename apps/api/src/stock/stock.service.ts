@@ -99,11 +99,6 @@ export class StockService {
     });
   }
 
-  /**
-   * Adds (or removes when change is negative) items from a warehouse.
-   * Uses a conditional update so two requests at the same time can't
-   * take the stock below zero.
-   */
   async changeStock(tx: Tx, productId: number, warehouseId: number, change: number) {
     if (change >= 0) {
       await tx.stock.upsert({
@@ -114,6 +109,7 @@ export class StockService {
       return;
     }
 
+    // only update if there is enough, so two requests at the same time can't go below 0
     const result = await tx.stock.updateMany({
       where: { productId, warehouseId, quantity: { gte: -change } },
       data: { quantity: { increment: change } },

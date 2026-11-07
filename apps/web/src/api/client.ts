@@ -15,7 +15,6 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   (error) => {
-    // token expired -> back to login
     if (error.response?.status === 401 && !error.config.url?.includes('/auth/')) {
       localStorage.removeItem(TOKEN_KEY);
       window.location.href = '/login';

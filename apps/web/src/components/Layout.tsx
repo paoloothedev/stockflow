@@ -31,7 +31,6 @@ export default function Layout() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* mobile top bar */}
       <header className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3 lg:hidden">
         <Logo />
         <button onClick={() => setOpen(true)} aria-label="Open menu">
