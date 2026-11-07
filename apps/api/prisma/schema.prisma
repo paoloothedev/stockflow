@@ -1,0 +1,135 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  STAFF
+}
+
+enum MovementType {
+  IN
+  OUT
+  ADJUST
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(STAFF)
+  createdAt DateTime @default(now())
+
+  movements StockMovement[]
+  orders    Order[]
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  products Product[]
+}
+
+model Product {
+  id          Int       @id @default(autoincrement())
+  sku         String    @unique
+  name        String
+  description String?
+  price       Decimal   @db.Decimal(10, 2)
+  minStock    Int       @default(5)
+  categoryId  Int?
+  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  stock      Stock[]
+  movements  StockMovement[]
+  orderItems OrderItem[]
+}
+
+model Warehouse {
+  id       Int     @id @default(autoincrement())
+  name     String  @unique
+  location String?
+
+  stock     Stock[]
+  movements StockMovement[]
+  orders    Order[]
+}
+
+// quantity of a product inside one warehouse
+model Stock {
+  productId   Int
+  warehouseId Int
+  quantity    Int @default(0)
+
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  warehouse Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+
+  @@id([productId, warehouseId])
+}
+
+model StockMovement {
+  id          Int          @id @default(autoincrement())
+  type        MovementType
+  quantity    Int
+  note        String?
+  productId   Int
+  warehouseId Int
+  userId      Int?
+  orderId     Int?
+  createdAt   DateTime     @default(now())
+
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  warehouse Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  user      User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  order     Order?    @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([productId])
+  @@index([createdAt])
+}
+
+model Order {
+  id            Int         @id @default(autoincrement())
+  customerName  String
+  customerPhone String?
+  address       String?
+  status        OrderStatus @default(PENDING)
+  total         Decimal     @db.Decimal(10, 2)
+  warehouseId   Int
+  createdById   Int?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  warehouse Warehouse       @relation(fields: [warehouseId], references: [id])
+  createdBy User?           @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  items     OrderItem[]
+  movements StockMovement[]
+
+  @@index([status])
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  quantity  Int
+  price     Decimal @db.Decimal(10, 2)
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+}
