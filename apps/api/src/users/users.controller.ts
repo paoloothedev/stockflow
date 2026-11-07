@@ -1,8 +1,16 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import { IsEnum } from 'class-validator';
-import { Roles } from '../common/decorators';
+import { CurrentUser, JwtUser, Roles } from '../common/decorators';
 import { PrismaService } from '../prisma/prisma.service';
 
 class UpdateRoleDto {
@@ -25,7 +33,13 @@ export class UsersController {
   }
 
   @Patch(':id/role')
-  updateRole(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateRoleDto) {
+  updateRole(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateRoleDto,
+    @CurrentUser() me: JwtUser,
+  ) {
+    // so the admin doesn't lock themselves out by mistake
+    if (id === me.id) throw new BadRequestException("You can't change your own role");
     return this.prisma.user.update({ where: { id }, data: { role: dto.role }, select: userSelect });
   }
 }
