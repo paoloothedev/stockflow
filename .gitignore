@@ -3,6 +3,8 @@ dist/
 coverage/
 .env
 .env.local
+.env.production.local
 *.log
 .DS_Store
 .vercel
+*.tsbuildinfo
